@@ -211,17 +211,14 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             );
 
             require(
-                paymentToken.transfer(
-                    auction.currentBidOwner,
-                    auction.totalCredit
-                ),
+                paymentToken.transfer(auction.currentBidOwner, totalCredit),
                 "AuctionMarketPlace: failed to transfer previous bid amount"
             );
 
             // send to other guys
 
             require(
-                paymentToken.transfer(address(0), auction.burned),
+                paymentToken.transfer(address(0), burned),
                 "AuctionMarketPlace: failed to burn"
             );
 
@@ -238,12 +235,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         auction.bidCount++;
 
         // emit the event
-        emit LibAppStorage.BidPlaced(
-            _auctionIndex,
-            msg.sender,
-            _bidAmount,
-            auction.currentBidPrice
-        );
+        emit LibAppStorage.BidPlaced(_auctionIndex, msg.sender, _bidAmount);
 
         return true;
     }

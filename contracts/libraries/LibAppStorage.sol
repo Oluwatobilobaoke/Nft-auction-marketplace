@@ -83,37 +83,6 @@ library LibAppStorage {
     // event where NFT is transferred to the creator
     event NFTRefund(uint256 index, address auctionCreator, uint256 nftTokenId);
 
-    function _transferFrom(
-        address _from,
-        address _to,
-        uint256 _tokenId
-    ) internal {
-        _transfer(_from, _to, _tokenId);
-    }
-
-    function _transfer(address _from, address _to, uint256 _tokenId) internal {
-        AppStorage storage l = getStorage();
-        require(
-            _from != address(0),
-            "ERC721: transfer of token that is not own"
-        );
-        require(_to != address(0), "ERC721: transfer to the zero address");
-        require(
-            l.owners[_tokenId] == msg.sender ||
-                l.tokenApprovals[_tokenId] == msg.sender,
-            "ERC721: transfer caller is not owner nor approved"
-        );
-        require(
-            l.owners[_tokenId] == _from,
-            "ERC721: transfer of token that is not own"
-        );
-        l.tokenApprovals[_tokenId] = address(0);
-        l.owners[_tokenId] = _to;
-        l.balances[_from]--;
-        l.balances[_to]++;
-        emit Transfer(_from, _to, _tokenId);
-    }
-
     // ERC20
     function transferFrom(address _from, address _to, uint256 _value) internal {
         AppStorage storage l = getStorage();
@@ -127,7 +96,7 @@ library LibAppStorage {
 
         l.balances[_from] = frombalances - _value;
         l.balances[_to] += _value;
-        emit LibERC20.Transfer(_to, _value);
+        emit LibERC20.Transfer(_from, _to, _value);
     }
 
     function transfer(address _to, uint256 _value) internal {
@@ -138,7 +107,7 @@ library LibAppStorage {
         );
         l.balances[msg.sender] -= _value;
         l.balances[_to] += _value;
-        emit LibERC20.Transfer(_to, _value);
+        emit LibERC20.Transfer(msg.sender, _to, _value);
     }
 
     function isContract(

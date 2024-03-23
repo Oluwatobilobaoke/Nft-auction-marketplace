@@ -9,7 +9,7 @@ import "../contracts/facets/OwnershipFacet.sol";
 import "../contracts/facets/ERC20Facet.sol";
 import "../contracts/facets/AuctionMarketPlaceFaucet.sol";
 
-// import "../contracts/NFTONE.sol";
+import "../contracts/NFTONE.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
@@ -28,12 +28,10 @@ contract DiamondDeployer is Test, IDiamondCut {
     address C = address(0xc);
     address D = address(0xd);
 
-
     AuctionMarketPlaceFaucet boundAuctionMarketPlace;
 
     function setUp() public {
-
-         A = mkaddr("user a");
+        A = mkaddr("user a");
 
         //deploy facets
         dCutFacet = new DiamondCutFacet();
@@ -42,7 +40,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         ownerF = new OwnershipFacet();
         erc20Facet = new ERC20Facet();
         auctionFaucet = new AuctionMarketPlaceFaucet();
-        nft = new NFTONE(A, "NFT Sample", "ONC");
+        nft = new NFTONE();
 
         //upgrade diamond with facets
 
@@ -67,7 +65,7 @@ contract DiamondDeployer is Test, IDiamondCut {
 
         cut[2] = (
             FacetCut({
-                facetAddress: address(sFacet),
+                facetAddress: address(auctionFaucet),
                 action: FacetCutAction.Add,
                 functionSelectors: generateSelectors("AuctionMarketPlaceFaucet")
             })
@@ -113,12 +111,11 @@ contract DiamondDeployer is Test, IDiamondCut {
     }
 
     function testGetAuctionMarketPlaceName() public {
-      switchSigner(A);
-      string auction = boundAuctionMarketPlace.name();
-      
-      console.log("auction name", auction);
-    }
+        switchSigner(A);
+        string memory auction = boundAuctionMarketPlace.name();
 
+        console.log("auction name", auction);
+    }
 
     function mkaddr(string memory name) public returns (address) {
         address addr = address(
@@ -137,7 +134,6 @@ contract DiamondDeployer is Test, IDiamondCut {
             vm.startPrank(_newSigner);
         }
     }
-
 
     function diamondCut(
         FacetCut[] calldata _diamondCut,
