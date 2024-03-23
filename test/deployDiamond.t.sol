@@ -9,7 +9,7 @@ import "../contracts/facets/OwnershipFacet.sol";
 import "../contracts/facets/ERC20Facet.sol";
 import "../contracts/facets/AuctionMarketPlaceFaucet.sol";
 
-import "../contracts/NFTONE.sol";
+// import "../contracts/NFTONE.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
