@@ -28,11 +28,11 @@ contract ERC721Facet {
     );
 
     function name() external view returns (string memory) {
-        return l._name;
+        return "OnChain NFT";
     }
 
     function symbol() external view returns (string memory) {
-        return l._symbol;
+        return "ONC";
     }
 
     function balanceOf(address _owner) external view returns (uint256 balance) {
