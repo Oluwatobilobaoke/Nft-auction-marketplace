@@ -4,11 +4,7 @@ pragma solidity ^0.8.0;
 import {LibERC20} from "./LibERC20.sol";
 
 library LibAppStorage {
-    event Transfer(
-        address indexed _from,
-        address indexed _to,
-        uint256 indexed _tokenId
-    );
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     struct AppStorage {
         //ERC20
@@ -72,32 +68,6 @@ library LibAppStorage {
     // event where NFT is transferred to the creator
     event NFTRefund(uint256 index, address auctionCreator, uint256 nftTokenId);
 
-    // ERC20
-    function transferFrom(address _from, address _to, uint256 _value) internal {
-        AppStorage storage l = getStorage();
-        uint256 _allowance = l.allowances[_from][msg.sender];
-        if (msg.sender != _from || _allowance < _value) {
-            revert("LibAppStorage: transfer amount exceeds allowance");
-        }
-        l.allowances[_from][msg.sender] = _allowance - _value;
-
-        uint256 frombalances = l.balances[msg.sender];
-
-        l.balances[_from] = frombalances - _value;
-        l.balances[_to] += _value;
-        emit LibERC20.Transfer(_from, _to, _value);
-    }
-
-    function transfer(address _to, uint256 _value) internal {
-        AppStorage storage l = getStorage();
-        require(
-            l.balances[msg.sender] >= _value,
-            "LibAppStorage: transfer amount exceeds balance"
-        );
-        l.balances[msg.sender] -= _value;
-        l.balances[_to] += _value;
-        emit LibERC20.Transfer(msg.sender, _to, _value);
-    }
 
     function isContract(
         address _addr
@@ -113,5 +83,22 @@ library LibAppStorage {
         assembly {
             l.slot := 0
         }
+    }
+
+    // ERC20
+    function _transferFrom(
+        address _from,
+        address _to,
+        uint256 _amount
+    ) internal {
+        AppStorage storage l = getStorage();
+        uint256 frombalances = l.balances[msg.sender];
+        require(
+            frombalances >= _amount,
+            "ERC20: Not enough tokens to transfer"
+        );
+        l.balances[_from] = frombalances - _amount;
+        l.balances[_to] += _amount;
+        emit Transfer(_from, _to, _amount);
     }
 }

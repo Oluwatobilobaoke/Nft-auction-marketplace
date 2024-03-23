@@ -31,8 +31,6 @@ contract DiamondDeployer is Test, IDiamondCut {
     AuctionMarketPlaceFaucet boundAuctionMarketPlace;
 
     function setUp() public {
-        A = mkaddr("user a");
-
         //deploy facets
         dCutFacet = new DiamondCutFacet();
         diamond = new Diamond(address(this), address(dCutFacet));
@@ -65,17 +63,17 @@ contract DiamondDeployer is Test, IDiamondCut {
 
         cut[2] = (
             FacetCut({
-                facetAddress: address(auctionFaucet),
+                facetAddress: address(erc20Facet),
                 action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("AuctionMarketPlaceFaucet")
+                functionSelectors: generateSelectors("ERC20Facet")
             })
         );
 
         cut[3] = (
             FacetCut({
-                facetAddress: address(erc20Facet),
+                facetAddress: address(auctionFaucet),
                 action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("ERC20Facet")
+                functionSelectors: generateSelectors("AuctionMarketPlaceFaucet")
             })
         );
 
@@ -85,6 +83,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         //call a function
         DiamondLoupeFacet(address(diamond)).facetAddresses();
 
+        A = mkaddr("user a");
         B = mkaddr("user b");
         C = mkaddr("user c");
         D = mkaddr("user d");
@@ -110,11 +109,17 @@ contract DiamondDeployer is Test, IDiamondCut {
         selectors = abi.decode(res, (bytes4[]));
     }
 
-    function testGetAuctionMarketPlaceName() public {
-        switchSigner(A);
-        string memory auction = boundAuctionMarketPlace.name();
+    // function testGetAuctionMarketPlaceName() public {
+    //     switchSigner(A);
+    //     string memory auction = boundAuctionMarketPlace.name();
 
-        console.log("auction name", auction);
+    //     console.log("auction name", auction);
+    // }
+
+    function testERC20Facet() public {
+        switchSigner(A);
+        uint256 bal = ERC20Facet(address(diamond)).balanceOf(A);
+        console.log("balance of A", bal);
     }
 
     function mkaddr(string memory name) public returns (address) {

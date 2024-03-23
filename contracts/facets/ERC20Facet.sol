@@ -6,14 +6,11 @@ import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 
 contract ERC20Facet {
     LibAppStorage.AppStorage internal l;
-
     event Approval(
         address indexed _owner,
         address indexed _spender,
         uint256 _value
     );
-
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     function name() external view returns (string memory) {
         return l.name;
@@ -39,7 +36,7 @@ contract ERC20Facet {
         address _to,
         uint256 _value
     ) public returns (bool success) {
-        LibAppStorage.transferFrom(msg.sender, _to, _value);
+        LibAppStorage._transferFrom(msg.sender, _to, _value);
         success = true;
     }
 
@@ -51,7 +48,7 @@ contract ERC20Facet {
         uint256 l_allowance = l.allowances[_from][msg.sender];
         if (msg.sender == _from || l.allowances[_from][msg.sender] >= _value) {
             l.allowances[_from][msg.sender] = l_allowance - _value;
-            LibAppStorage.transferFrom(_from, _to, _value);
+            LibAppStorage._transferFrom(_from, _to, _value);
 
             emit Approval(_from, msg.sender, l_allowance - _value);
 
@@ -82,6 +79,6 @@ contract ERC20Facet {
         uint256 amount = 100_000_000e18;
         l.balances[_user] += amount;
         l.totalSupply += uint96(amount);
-        emit Transfer(address(0), _user, amount);
+        emit LibAppStorage.Transfer(address(0), _user, amount);
     }
 }
