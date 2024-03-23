@@ -126,19 +126,19 @@ library LibAppStorage {
         uint256 frombalances = l.balances[msg.sender];
 
         l.balances[_from] = frombalances - _value;
-        l.balances[_to] += _amount;
-        emit LibERC20.Transfer(_from, _to, _value);
+        l.balances[_to] += _value;
+        emit LibERC20.Transfer(_to, _value);
     }
 
     function transfer(address _to, uint256 _value) internal {
         AppStorage storage l = getStorage();
         require(
-            s.balances[msg.sender] >= _value,
+            l.balances[msg.sender] >= _value,
             "LibAppStorage: transfer amount exceeds balance"
         );
         l.balances[msg.sender] -= _value;
         l.balances[_to] += _value;
-        emit LibERC20.Transfer(_from, _to, _value);
+        emit LibERC20.Transfer(_to, _value);
     }
 
     function isContract(

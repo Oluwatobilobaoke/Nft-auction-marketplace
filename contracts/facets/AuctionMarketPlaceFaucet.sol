@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC721} from "../interfaces/IERC721.sol";
+import {IERC1155} from "../interfaces/IERC1155.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -38,17 +39,17 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         );
 
         require(
-            isContract(_addressNFTCollection),
+            LibAppStorage.isContract(_addressNFTCollection),
             "AuctionMarketPlace: invalid NFT Collection address"
         );
 
-        if (_category == LibAppStorage.Categories.ERC721) {
-            IERC721 nftCollection = IERC721(_addressNFTCollection);
-        }
+        // if (_category == LibAppStorage.Categories.ERC721) {
+        IERC721 nftCollection = IERC721(_addressNFTCollection);
+        // }
 
-        if (_category == LibAppStorage.Categories.ERC1155) {
-            IERC1155 nftCollection = IERC1155(_addressNFTCollection);
-        }
+        // if (_category == LibAppStorage.Categories.ERC1155) {
+        //     IERC1155 nftCollection = IERC1155(_addressNFTCollection);
+        // }
 
         require(
             nftCollection.ownerOf(_nftTokenId) == msg.sender,
@@ -101,7 +102,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     }
 
     // create function to check if auction is open
-    function isAuctionOpen(uint256 _auctionIndex) external view returns (bool) {
+    function isAuctionOpen(uint256 _auctionIndex) public view returns (bool) {
         return
             LibAppStorage.allAuctions[_auctionIndex].endAuction >
             block.timestamp;
@@ -132,7 +133,9 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        Auction storage auction = LibAppStorage.allAuctions[_auctionIndex];
+        LibAppStorage.Auction storage auction = LibAppStorage.allAuctions[
+            _auctionIndex
+        ];
 
         // check auction is open
         require(
@@ -253,7 +256,9 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        Auction storage auction = LibAppStorage.allAuctions[_auctionIndex];
+        LibAppStorage.Auction storage auction = LibAppStorage.allAuctions[
+            _auctionIndex
+        ];
 
         // check auction is closed
         require(
@@ -304,7 +309,9 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        Auction storage auction = LibAppStorage.allAuctions[_auctionIndex];
+        LibAppStorage.Auction storage auction = LibAppStorage.allAuctions[
+            _auctionIndex
+        ];
 
         // check auction is closed
         require(
@@ -355,7 +362,9 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        Auction storage auction = LibAppStorage.allAuctions[_auctionIndex];
+        LibAppStorage.Auction storage auction = LibAppStorage.allAuctions[
+            _auctionIndex
+        ];
 
         // check auction is closed
         require(
