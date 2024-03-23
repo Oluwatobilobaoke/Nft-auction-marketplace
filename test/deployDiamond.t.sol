@@ -9,6 +9,7 @@ import "../contracts/facets/OwnershipFacet.sol";
 import "../contracts/facets/ERC20Facet.sol";
 import "../contracts/facets/AuctionMarketPlaceFaucet.sol";
 
+import "../contracts/NFTONE.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
@@ -20,17 +21,20 @@ contract DiamondDeployer is Test, IDiamondCut {
     OwnershipFacet ownerF;
     ERC20Facet erc20Facet;
     AuctionMarketPlaceFaucet auctionFaucet;
+    NFTONE nft;
 
     address A = address(0xa);
     address B = address(0xb);
     address C = address(0xc);
     address D = address(0xd);
 
-    address erc721collection = address(0x1);
 
     AuctionMarketPlaceFaucet boundAuctionMarketPlace;
 
     function setUp() public {
+
+         A = mkaddr("user a");
+
         //deploy facets
         dCutFacet = new DiamondCutFacet();
         diamond = new Diamond(address(this), address(dCutFacet));
@@ -38,6 +42,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         ownerF = new OwnershipFacet();
         erc20Facet = new ERC20Facet();
         auctionFaucet = new AuctionMarketPlaceFaucet();
+        nft = new NFTONE(A, "NFT Sample", "ONC");
 
         //upgrade diamond with facets
 
@@ -82,7 +87,6 @@ contract DiamondDeployer is Test, IDiamondCut {
         //call a function
         DiamondLoupeFacet(address(diamond)).facetAddresses();
 
-        A = mkaddr("user a");
         B = mkaddr("user b");
         C = mkaddr("user c");
         D = mkaddr("user d");
@@ -108,6 +112,14 @@ contract DiamondDeployer is Test, IDiamondCut {
         selectors = abi.decode(res, (bytes4[]));
     }
 
+    function testGetAuctionMarketPlaceName() public {
+      switchSigner(A);
+      string auction = boundAuctionMarketPlace.name();
+      
+      console.log("auction name", auction);
+    }
+
+
     function mkaddr(string memory name) public returns (address) {
         address addr = address(
             uint160(uint256(keccak256(abi.encodePacked(name))))
@@ -125,6 +137,7 @@ contract DiamondDeployer is Test, IDiamondCut {
             vm.startPrank(_newSigner);
         }
     }
+
 
     function diamondCut(
         FacetCut[] calldata _diamondCut,

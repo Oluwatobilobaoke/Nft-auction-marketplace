@@ -23,12 +23,11 @@ library LibAppStorage {
         mapping(address => mapping(address => uint256)) allowances;
 
         //ERC721
-        string private _symbol;
-        mapping(uint256 tokenId => address) private _owners;
-        mapping(address owner => uint256) private _balances;
-        mapping(uint256 tokenId => address) private _tokenApprovals;
+        mapping(uint256 tokenId => address) _owners;
+        mapping(address owner => uint256) _balances;
+        mapping(uint256 tokenId => address) _tokenApprovals;
         mapping(uint256 tokenId => string) tokenURI;
-        mapping(address owner => mapping(address operator => bool)) private _operatorApprovals;
+        mapping(address owner => mapping(address operator => bool)) _operatorApprovals;
 
         //ERC 1155
 
@@ -52,7 +51,7 @@ library LibAppStorage {
       uint256 nftTokenId;
       address auctionCreator;
       address payable currentBidOwner;
-      uint256 currentBidPrice
+      uint256 currentBidPrice;
       uint256 endAuction;
       uint256 bidCount;
       uint256 minBid;

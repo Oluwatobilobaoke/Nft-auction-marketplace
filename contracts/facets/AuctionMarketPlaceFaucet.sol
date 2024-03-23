@@ -159,13 +159,10 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         // get the erc20 token
         IERC20 paymentToken = IERC20(auction.addressPaymentToken);
 
-
-
         if (auction.currentBidOwner == address(0)) {
-
             require(
-              paymentToken.allowance(msg.sender, address(this)) >= _bidAmount,
-              "AuctionMarketPlace: not enough allowance to transfer"
+                paymentToken.allowance(msg.sender, address(this)) >= _bidAmount,
+                "AuctionMarketPlace: not enough allowance to transfer"
             );
 
             require(
@@ -183,7 +180,9 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             auction.currentBidOwner != address(0) && auction.currentBidPrice > 0
         ) {
             // do that calculation
-            uint256 totalFee = calculateIncentiveTotalFee(auction.currentBidPrice);
+            uint256 totalFee = calculateIncentiveTotalFee(
+                auction.currentBidPrice
+            );
 
             uint256 burned = calculateIncentiveBurned(totalFee);
             uint256 dao = calculateIncentiveDAO(totalFee);
@@ -215,7 +214,18 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
                 "AuctionMarketPlace: failed to transfer previous bid amount"
             );
 
+            // send to other guys
 
+            require(
+                paymentToken.transfer(address(0), auction.burned),
+                "AuctionMarketPlace: failed to burn"
+            );
+
+            // send dao share
+
+            // send team share
+
+            // send lastAddress
         }
 
         // update the current bid owner and price
@@ -393,7 +403,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // 2% goes to the team wallet(just random)
     // 1% is sent to the last address to interact with AUCToken(write calls like transfer,transferFrom,approve,mint etc)
     function calculateIncentiveTotalFee(
-        uint256 _highestBid,
+        uint256 _highestBid
     ) external view returns (uint256) {
         uint256 totalFee = (_highestBid * 10) / 100;
         return totalFee;

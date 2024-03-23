@@ -135,7 +135,7 @@ contract ERC721Facet {
             '"name": "YDM #',
             id,
             '",',
-            '"description": "Yield Guild Games NFT",
+            '"description": "Yield Guild Games NFT"',
             id,
             '",',
             '"image": "',
