@@ -18,14 +18,6 @@ library LibAppStorage {
         uint8 decimals;
         mapping(address => uint256) balances;
         mapping(address => mapping(address => uint256)) allowances;
-        //ERC721
-        mapping(uint256 tokenId => address) _owners;
-        mapping(address owner => uint256) _balances;
-        mapping(uint256 tokenId => address) _tokenApprovals;
-        mapping(uint256 tokenId => string) tokenURI;
-        mapping(address owner => mapping(address operator => bool)) _operatorApprovals;
-        //ERC 1155
-
         // AUCTION MARKETPLACE
         uint256 index;
     }
@@ -49,9 +41,6 @@ library LibAppStorage {
         uint256 bidCount;
         uint256 minBid;
     }
-
-    // Array to store all the auctions
-    Auction[] public allAuctions;
 
     // event to notify when a new auction is created
     event AuctionCreated(
