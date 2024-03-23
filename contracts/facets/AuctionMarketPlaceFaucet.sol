@@ -3,7 +3,8 @@ pragma solidity ^0.8.20;
 
 import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721} from "../interfaces/IERC721.sol";
+
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract AuctionMarketPlaceFaucet is IERC721Receiver {
@@ -404,7 +405,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // 1% is sent to the last address to interact with AUCToken(write calls like transfer,transferFrom,approve,mint etc)
     function calculateIncentiveTotalFee(
         uint256 _highestBid
-    ) external view returns (uint256) {
+    ) private view returns (uint256) {
         uint256 totalFee = (_highestBid * 10) / 100;
         return totalFee;
     }
@@ -412,7 +413,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // function to amount to be burned
     function calculateIncentiveBurned(
         uint256 _totalFee
-    ) external view returns (uint256) {
+    ) private view returns (uint256) {
         uint256 burned = (_totalFee * 2) / 100;
         return burned;
     }
@@ -420,7 +421,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // function to amount to be sent to dAO address
     function calculateIncentiveDAO(
         uint256 _totalFee
-    ) external view returns (uint256) {
+    ) private view returns (uint256) {
         uint256 dao = (_totalFee * 2) / 100;
         return dao;
     }
@@ -428,7 +429,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // function to amount to be sent to outbid bidder
     function calculateIncentiveOutbid(
         uint256 _totalFee
-    ) external view returns (uint256) {
+    ) private view returns (uint256) {
         uint256 outbid = (_totalFee * 3) / 100;
         return outbid;
     }
@@ -436,7 +437,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // function to amount to be sent to team wallet
     function calculateIncentiveTeam(
         uint256 _totalFee
-    ) external view returns (uint256) {
+    ) private view returns (uint256) {
         uint256 team = (_totalFee * 2) / 100;
         return team;
     }
@@ -444,8 +445,17 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // function to amount to be sent to last address to interact with AUCToken
     function calculateIncentiveLastAddress(
         uint256 _totalFee
-    ) external view returns (uint256) {
+    ) private view returns (uint256) {
         uint256 lastAddress = (_totalFee * 1) / 100;
         return lastAddress;
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes memory
+    ) public virtual override returns (bytes4) {
+        return this.onERC721Received.selector;
     }
 }
