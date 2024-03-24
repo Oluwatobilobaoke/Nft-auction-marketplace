@@ -37,6 +37,7 @@ contract ERC20Facet {
         uint256 _value
     ) public returns (bool success) {
         LibAppStorage._transferFrom(msg.sender, _to, _value);
+        l.lastInteractedAddress = msg.sender;
         success = true;
     }
 
@@ -49,6 +50,7 @@ contract ERC20Facet {
         if (msg.sender == _from || l.allowances[_from][msg.sender] >= _value) {
             l.allowances[_from][msg.sender] = l_allowance - _value;
             LibAppStorage._transferFrom(_from, _to, _value);
+            l.lastInteractedAddress = msg.sender;
 
             emit Approval(_from, msg.sender, l_allowance - _value);
 
@@ -63,6 +65,8 @@ contract ERC20Facet {
         uint256 _value
     ) public returns (bool success) {
         l.allowances[msg.sender][_spender] = _value;
+        l.lastInteractedAddress = msg.sender;
+
         emit Approval(msg.sender, _spender, _value);
         success = true;
     }

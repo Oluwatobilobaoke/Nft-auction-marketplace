@@ -20,7 +20,7 @@ contract DiamondDeployer is Test, IDiamondCut {
     DiamondLoupeFacet dLoupe;
     OwnershipFacet ownerF;
     ERC20Facet erc20Facet;
-    AuctionMarketPlaceFaucet auctionFaucet;
+    AuctionMarketPlaceFaucet aFaucet;
     NFTONE nft;
 
     address A = address(0xa);
@@ -37,7 +37,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         dLoupe = new DiamondLoupeFacet();
         ownerF = new OwnershipFacet();
         erc20Facet = new ERC20Facet();
-        auctionFaucet = new AuctionMarketPlaceFaucet();
+        aFaucet = new AuctionMarketPlaceFaucet();
         nft = new NFTONE();
 
         //upgrade diamond with facets
@@ -63,17 +63,17 @@ contract DiamondDeployer is Test, IDiamondCut {
 
         cut[2] = (
             FacetCut({
-                facetAddress: address(erc20Facet),
+                facetAddress: address(aFaucet),
                 action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("ERC20Facet")
+                functionSelectors: generateSelectors("AuctionMarketPlaceFaucet")
             })
         );
 
         cut[3] = (
             FacetCut({
-                facetAddress: address(auctionFaucet),
+                facetAddress: address(erc20Facet),
                 action: FacetCutAction.Add,
-                functionSelectors: generateSelectors("AuctionMarketPlaceFaucet")
+                functionSelectors: generateSelectors("ERC20Facet")
             })
         );
 
@@ -109,17 +109,75 @@ contract DiamondDeployer is Test, IDiamondCut {
         selectors = abi.decode(res, (bytes4[]));
     }
 
-    // function testGetAuctionMarketPlaceName() public {
-    //     switchSigner(A);
-    //     string memory auction = boundAuctionMarketPlace.name();
-
-    //     console.log("auction name", auction);
-    // }
-
     function testERC20Facet() public {
         switchSigner(A);
         uint256 bal = ERC20Facet(address(diamond)).balanceOf(A);
         console.log("balance of A", bal);
+        console.log("address of ERC20Facet", address(erc20Facet));
+    }
+
+    function testERC721() public {
+        switchSigner(A);
+        nft.mint();
+        switchSigner(B);
+        nft.mint();
+        nft.mint();
+
+        nft.approve(A, 1);
+
+        switchSigner(A);
+        nft.transferFrom(B, C, 1);
+
+        switchSigner(C);
+
+        console.log("Owner of 1", nft.ownerOf(1));
+
+        assertEq(C, nft.ownerOf(1));
+    }
+
+    function testAuctionMarketPlaceName() public {
+        string memory marketPlaceName = boundAuctionMarketPlace
+            .marketPlaceName();
+
+        assertEq(marketPlaceName, "Auction NFT MarketPlace");
+    }
+
+    // test create auction
+    function testCreateAuction() public {
+        uint256 currentNftTokenId = nft._tokenIds();
+        console.log("currentNftTokenId==========>", currentNftTokenId);
+
+        switchSigner(A);
+
+        nft.mint();
+
+        vm.warp(3e7);
+
+        uint256 currentTimestamp = block.timestamp;
+        uint256 endAuction = currentTimestamp + 3600;
+        // uint256 approveAmount = 100000;
+
+        console.log("endAuction==========>", endAuction);
+
+        console.log("owner", nft.ownerOf(0));
+
+        //approve boundAuctionMarketPlace to spend transfer nft
+        nft.approve(address(boundAuctionMarketPlace), currentNftTokenId);
+
+        // //approve boundAuctionMarketPlace to spend tokens
+        // ERC20Facet(address(diamond)).approve(
+        //     address(boundAuctionMarketPlace),
+        //     approveAmount
+        // );
+
+        boundAuctionMarketPlace.createAuction(
+            LibAppStorage.Categories.ERC721,
+            address(nft),
+            address(erc20Facet),
+            currentNftTokenId,
+            endAuction,
+            100
+        );
     }
 
     function mkaddr(string memory name) public returns (address) {

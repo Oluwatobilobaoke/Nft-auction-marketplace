@@ -12,7 +12,7 @@ contract NFTONE {
     mapping(uint256 tokenId => uint256) listings;
     mapping(uint256 tokenId => string) tokenURI;
 
-    uint256 _tokenIds;
+    uint256 public _tokenIds;
 
     event Transfer(
         address indexed from,

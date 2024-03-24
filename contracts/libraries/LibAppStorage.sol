@@ -15,7 +15,10 @@ library LibAppStorage {
         mapping(address => uint256) balances;
         mapping(address => mapping(address => uint256)) allowances;
         // AUCTION MARKETPLACE
-        uint256 index;
+        uint256 auctionIndex;
+        address daoAddress;
+        address teamAddress;
+        address lastInteractedAddress;
     }
 
     enum Categories {
@@ -67,7 +70,6 @@ library LibAppStorage {
 
     // event where NFT is transferred to the creator
     event NFTRefund(uint256 index, address auctionCreator, uint256 nftTokenId);
-
 
     function isContract(
         address _addr

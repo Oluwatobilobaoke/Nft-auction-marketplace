@@ -14,7 +14,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     // Array to store all the auctions
     LibAppStorage.Auction[] public allAuctions;
 
-    function name() external pure returns (string memory) {
+    function marketPlaceName() external pure returns (string memory) {
         return "Auction NFT MarketPlace";
     }
 
@@ -73,7 +73,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
 
         // create the auction
         LibAppStorage.Auction memory auction = LibAppStorage.Auction({
-            index: l.index,
+            index: l.auctionIndex,
             category: _category,
             addressNFTCollection: _addressNFTCollection,
             addressPaymentToken: _addressPaymentToken,
@@ -90,7 +90,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         allAuctions.push(auction);
 
         // increment the index
-        l.index++;
+        l.auctionIndex++;
 
         // emit the event
         emit LibAppStorage.AuctionCreated(
@@ -106,9 +106,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
 
     // create function to check if auction is open
     function isAuctionOpen(uint256 _auctionIndex) public view returns (bool) {
-        return
-            allAuctions[_auctionIndex].endAuction >
-            block.timestamp;
+        return allAuctions[_auctionIndex].endAuction > block.timestamp;
     }
 
     // get current bid price
@@ -136,9 +134,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        LibAppStorage.Auction storage auction = allAuctions[
-            _auctionIndex
-        ];
+        LibAppStorage.Auction storage auction = allAuctions[_auctionIndex];
 
         // check auction is open
         require(
@@ -226,10 +222,22 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             );
 
             // send dao share
+            require(
+                paymentToken.transfer(l.daoAddress, dao),
+                "ActionMarketPlace: failed to transfer to DAO address"
+            );
 
             // send team share
+            require(
+                paymentToken.transfer(l.teamAddress, team),
+                "ActionMarketPlace: failed to transfer to Team address"
+            );
 
             // send lastAddress
+            require(
+                paymentToken.transfer(l.lastInteractedAddress, lastAddress),
+                "ActionMarketPlace: failed to transfer to last address"
+            );
         }
 
         // update the current bid owner and price
@@ -251,9 +259,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        LibAppStorage.Auction storage auction = allAuctions[
-            _auctionIndex
-        ];
+        LibAppStorage.Auction storage auction = allAuctions[_auctionIndex];
 
         // check auction is closed
         require(
@@ -304,9 +310,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        LibAppStorage.Auction storage auction = allAuctions[
-            _auctionIndex
-        ];
+        LibAppStorage.Auction storage auction = allAuctions[_auctionIndex];
 
         // check auction is closed
         require(
@@ -357,9 +361,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: auction does not exist"
         );
 
-        LibAppStorage.Auction storage auction = allAuctions[
-            _auctionIndex
-        ];
+        LibAppStorage.Auction storage auction = allAuctions[_auctionIndex];
 
         // check auction is closed
         require(
