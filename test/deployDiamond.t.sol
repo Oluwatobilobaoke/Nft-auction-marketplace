@@ -29,6 +29,8 @@ contract DiamondDeployer is Test, IDiamondCut {
     address B = address(0xb);
     address C = address(0xc);
     address D = address(0xd);
+    address DAO = address(0xda);
+    address TEAM = address(0xea);
 
     AuctionMarketPlaceFaucet boundAuctionMarketPlace;
 
@@ -81,6 +83,13 @@ contract DiamondDeployer is Test, IDiamondCut {
 
         //upgrade diamond
         IDiamondCut(address(diamond)).diamondCut(cut, address(0x0), "");
+
+        DAO = mkaddr("dao address");
+        TEAM = mkaddr("team address");
+
+        // set address
+        diamond.setDAoAddress(address(DAO));
+        diamond.setTeamAddress(address(TEAM));
 
         //call a function
         DiamondLoupeFacet(address(diamond)).facetAddresses();
@@ -190,7 +199,8 @@ contract DiamondDeployer is Test, IDiamondCut {
         assertEq(currentBidOwner, address(0));
     }
 
-    // test place bid
+    // test creation and auction and also test for placing of bid
+    function testCreateAuctionAndMultipleBid() public {}
 
     function mkaddr(string memory name) public returns (address) {
         address addr = address(

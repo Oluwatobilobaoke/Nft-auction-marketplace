@@ -10,8 +10,11 @@ pragma solidity ^0.8.0;
 
 import {LibDiamond} from "./libraries/LibDiamond.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
+import {LibAppStorage} from "./libraries/LibAppStorage.sol";
 
 contract Diamond {
+    LibAppStorage.AppStorage internal l;
+
     constructor(address _contractOwner, address _diamondCutFacet) payable {
         LibDiamond.setContractOwner(_contractOwner);
 
@@ -25,6 +28,16 @@ contract Diamond {
             functionSelectors: functionSelectors
         });
         LibDiamond.diamondCut(cut, address(0), "");
+    }
+
+    function setDAoAddress(address _token) public {
+        LibDiamond.enforceIsContractOwner();
+        l.daoAddress = _token;
+    }
+
+    function setTeamAddress(address _token) public {
+        LibDiamond.enforceIsContractOwner();
+        l.teamAddress = _token;
     }
 
     // Find facet for function that is called and execute the
