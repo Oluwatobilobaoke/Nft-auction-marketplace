@@ -177,6 +177,7 @@ contract DiamondDeployer is Test, IDiamondCut {
             address(nft),
             address(erc20Facet),
             currentNftTokenId,
+            2000,
             endAuction,
             100
         );
@@ -185,7 +186,7 @@ contract DiamondDeployer is Test, IDiamondCut {
         address currentBidOwner = boundAuctionMarketPlace.getCurrentBidOwner(0);
         // LibAppStorage.Auction storage a = boundAuctionMarketPlace.getAuctionDetails(0);
 
-        assertEq(a.currentBidPrice, 0);
+        assertEq(auctionBidPrice, 0);
         assertEq(currentBidOwner, address(0));
     }
 

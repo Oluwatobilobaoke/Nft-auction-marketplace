@@ -33,6 +33,7 @@ library LibAppStorage {
         address addressNFTCollection;
         address addressPaymentToken;
         uint256 nftTokenId;
+        uint256 tokenAmount;
         address auctionCreator;
         address payable currentBidOwner;
         uint256 currentBidPrice;

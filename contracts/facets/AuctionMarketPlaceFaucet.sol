@@ -5,10 +5,11 @@ import {LibAppStorage} from "../libraries/LibAppStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import {IERC721} from "../interfaces/IERC721.sol";
 import {IERC1155} from "../interfaces/IERC1155.sol";
+import {IERC1155TokenReceiver} from "../interfaces/IERC1155TokenReceiver.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract AuctionMarketPlaceFaucet is IERC721Receiver {
+contract AuctionMarketPlaceFaucet is IERC1155TokenReceiver, IERC721Receiver {
     LibAppStorage.AppStorage internal l;
     LibAppStorage.Auction internal la;
 
@@ -24,6 +25,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         address _addressNFTCollection,
         address _addressPaymentToken,
         uint256 _nftTokenId,
+        uint256 tokenAmount,
         uint256 _endAuction,
         uint256 _minBid
     ) external {
@@ -47,27 +49,41 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             "AuctionMarketPlace: invalid NFT Collection address"
         );
 
-        // if (_category == LibAppStorage.Categories.ERC721) {
-        IERC721 nftCollection = IERC721(_addressNFTCollection);
-        // }
+        if (_category == LibAppStorage.Categories.ERC721) {
+            IERC721 nftCollection = IERC721(_addressNFTCollection);
 
-        // if (_category == LibAppStorage.Categories.ERC1155) {
-        //     IERC1155 nftCollection = IERC1155(_addressNFTCollection);
-        // }
+            require(
+                nftCollection.ownerOf(_nftTokenId) == msg.sender,
+                "AuctionMarketPlace: not owner of NFT"
+            );
 
-        require(
-            nftCollection.ownerOf(_nftTokenId) == msg.sender,
-            "AuctionMarketPlace: not owner of NFT"
-        );
+            // check if owner has approved the marketplace to transfer the NFT
+            require(
+                nftCollection.getApproved(_nftTokenId) == address(this),
+                "AuctionMarketPlace: not approved to transfer NFT"
+            );
 
-        // check if owner has approved the marketplace to transfer the NFT
-        require(
-            nftCollection.getApproved(_nftTokenId) == address(this),
-            "AuctionMarketPlace: not approved to transfer NFT"
-        );
+            nftCollection.transferFrom(msg.sender, address(this), _nftTokenId);
+        }
+
+        if (_category == LibAppStorage.Categories.ERC1155) {
+            IERC1155 nftCollection = IERC1155(_addressNFTCollection);
+
+            require(
+                nftCollection.balanceOf(msg.sender, _nftTokenId) > tokenAmount,
+                "AuctionMarketPlace: Insufficient money"
+            );
+
+            nftCollection.safeTransferFrom(
+                msg.sender,
+                address(this),
+                _nftTokenId,
+                tokenAmount,
+                ""
+            );
+        }
 
         // transfer the NFT to the marketplace
-        nftCollection.transferFrom(msg.sender, address(this), _nftTokenId);
 
         // cast the address to payable
         address payable currentBidOwner = payable(address(0));
@@ -79,6 +95,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
             addressNFTCollection: _addressNFTCollection,
             addressPaymentToken: _addressPaymentToken,
             nftTokenId: _nftTokenId,
+            tokenAmount: tokenAmount,
             auctionCreator: msg.sender,
             currentBidOwner: currentBidOwner,
             currentBidPrice: 0,
@@ -504,5 +521,35 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         bytes memory
     ) public virtual override returns (bytes4) {
         return this.onERC721Received.selector;
+    }
+
+    function onERC1155Received(
+        address /* _operator */,
+        address /* _from */,
+        uint256 /* _id */,
+        uint256 /* _value */,
+        bytes calldata /* _data */
+    ) external pure override returns (bytes4) {
+        return
+            bytes4(
+                keccak256(
+                    "onERC1155Received(address,address,uint256,uint256,bytes)"
+                )
+            );
+    }
+
+    function onERC1155BatchReceived(
+        address /* _operator */,
+        address /* _from */,
+        uint256[] calldata /* _ids */,
+        uint256[] calldata /* _values */,
+        bytes calldata /* _data */
+    ) external pure override returns (bytes4) {
+        return
+            bytes4(
+                keccak256(
+                    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"
+                )
+            );
     }
 }
