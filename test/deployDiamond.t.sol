@@ -178,7 +178,13 @@ contract DiamondDeployer is Test, IDiamondCut {
             endAuction,
             100
         );
+
+        uint256 auctionBidPrice = boundAuctionMarketPlace.getCurrentBidPrice(0);
+
+        assertEq(auctionBidPrice, 0);
     }
+
+    // test create auction to fail if not 
 
     function mkaddr(string memory name) public returns (address) {
         address addr = address(

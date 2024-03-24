@@ -66,7 +66,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         );
 
         // transfer the NFT to the marketplace
-        nftCollection.safeTransferFrom(msg.sender, address(this), _nftTokenId);
+        nftCollection.transferFrom(msg.sender, address(this), _nftTokenId);
 
         // cast the address to payable
         address payable currentBidOwner = payable(address(0));
@@ -277,7 +277,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         IERC721 nftCollection = IERC721(auction.addressNFTCollection);
 
         // transfer the NFT to the winner
-        nftCollection.safeTransferFrom(
+        nftCollection.transferFrom(
             address(this),
             msg.sender,
             auction.nftTokenId
@@ -328,7 +328,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         IERC721 nftCollection = IERC721(auction.addressNFTCollection);
 
         // transfer the NFT to the creator
-        nftCollection.safeTransferFrom(
+        nftCollection.transferFrom(
             address(this),
             auction.currentBidOwner,
             auction.nftTokenId
@@ -385,7 +385,7 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
         IERC721 nftCollection = IERC721(auction.addressNFTCollection);
 
         // transfer the NFT to the creator
-        nftCollection.safeTransferFrom(
+        nftCollection.transferFrom(
             address(this),
             auction.auctionCreator,
             auction.nftTokenId
