@@ -13,6 +13,8 @@ import "../contracts/NFTONE.sol";
 import "forge-std/Test.sol";
 import "../contracts/Diamond.sol";
 
+import "../contracts/libraries/LibAppStorage.sol";
+
 contract DiamondDeployer is Test, IDiamondCut {
     //contract types of facets to be deployed
     Diamond diamond;
@@ -180,11 +182,14 @@ contract DiamondDeployer is Test, IDiamondCut {
         );
 
         uint256 auctionBidPrice = boundAuctionMarketPlace.getCurrentBidPrice(0);
+        address currentBidOwner = boundAuctionMarketPlace.getCurrentBidOwner(0);
+        // LibAppStorage.Auction storage a = boundAuctionMarketPlace.getAuctionDetails(0);
 
-        assertEq(auctionBidPrice, 0);
+        assertEq(a.currentBidPrice, 0);
+        assertEq(currentBidOwner, address(0));
     }
 
-    // test create auction to fail if not 
+    // test place bid
 
     function mkaddr(string memory name) public returns (address) {
         address addr = address(

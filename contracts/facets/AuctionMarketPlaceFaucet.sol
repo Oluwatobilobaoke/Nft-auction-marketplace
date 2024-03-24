@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract AuctionMarketPlaceFaucet is IERC721Receiver {
     LibAppStorage.AppStorage internal l;
+    LibAppStorage.Auction internal la;
 
     // Array to store all the auctions
     LibAppStorage.Auction[] public allAuctions;
@@ -108,6 +109,46 @@ contract AuctionMarketPlaceFaucet is IERC721Receiver {
     function isAuctionOpen(uint256 _auctionIndex) public view returns (bool) {
         return allAuctions[_auctionIndex].endAuction > block.timestamp;
     }
+
+    // // get current bid price
+    // function getAuctionDetails(
+    //     uint256 _auctionIndex
+    // )
+    //     external
+    //     view
+    //     returns (
+    //         // la.Categories category,
+    //         address addressNFTCollection,
+    //         address addressPaymentToken,
+    //         uint nftTokenId,
+    //         address auctionCreator,
+    //         address currentBidOwner,
+    //         uint currentBidPrice,
+    //         uint endAuction,
+    //         uint bidCount,
+    //         uint minBid
+    //     )
+    // {
+    //     // check auction exists
+    //     require(
+    //         _auctionIndex < allAuctions.length,
+    //         "AuctionMarketPlace: auction does not exist"
+    //     );
+
+    //     LibAppStorage.Auction storage auction = allAuctions[_auctionIndex];
+    //     return (
+    //         // auction.category,
+    //         auction.addressNFTCollection,
+    //         auction.addressPaymentToken,
+    //         auction.nftTokenId,
+    //         auction.auctionCreator,
+    //         auction.currentBidOwner,
+    //         auction.currentBidPrice,
+    //         auction.endAuction,
+    //         auction.bidCount,
+    //         auction.minBid
+    //     );
+    // }
 
     // get current bid price
     function getCurrentBidPrice(
