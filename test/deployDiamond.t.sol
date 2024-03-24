@@ -200,7 +200,47 @@ contract DiamondDeployer is Test, IDiamondCut {
     }
 
     // test creation and auction and also test for placing of bid
-    function testCreateAuctionAndMultipleBid() public {}
+    function testCreateAuctionAndMultipleBid() public {
+        uint256 currentNftTokenId = nft._tokenIds();
+        console.log("currentNftTokenId==========>", currentNftTokenId);
+
+        switchSigner(A);
+
+        nft.mint();
+
+        vm.warp(10e7);
+
+        uint256 currentTimestamp = block.timestamp;
+        uint256 endAuction = currentTimestamp + 3600;
+
+        console.log("owner", nft.ownerOf(currentNftTokenId));
+
+        nft.approve(address(boundAuctionMarketPlace), currentNftTokenId);
+
+        boundAuctionMarketPlace.createAuction(
+            LibAppStorage.Categories.ERC721,
+            address(nft),
+            address(erc20Facet),
+            currentNftTokenId,
+            2000,
+            endAuction,
+            100
+        );
+
+        switchSigner(B);
+
+        //approve boundAuctionMarketPlace to spend tokens
+        ERC20Facet(address(diamond)).approve(
+            address(boundAuctionMarketPlace),
+            4000e18
+        );
+
+        // check allowance of diamond with signerB
+        console.log("ALLOWANCE==>", ERC20Facet(address(diamond)).allowance(B, address(boundAuctionMarketPlace)));
+
+        boundAuctionMarketPlace.placeBid(0, 2000);
+
+    }
 
     function mkaddr(string memory name) public returns (address) {
         address addr = address(

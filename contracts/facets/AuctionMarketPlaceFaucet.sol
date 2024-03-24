@@ -221,10 +221,10 @@ contract AuctionMarketPlaceFaucet is IERC1155TokenReceiver, IERC721Receiver {
         IERC20 paymentToken = IERC20(auction.addressPaymentToken);
 
         if (auction.currentBidOwner == address(0)) {
-            require(
-                paymentToken.allowance(msg.sender, address(this)) >= _bidAmount,
-                "AuctionMarketPlace: not enough allowance to transfer"
-            );
+            // require(
+            //     paymentToken.allowance(msg.sender, address(this)) >= _bidAmount,
+            //     "AuctionMarketPlace: not enough allowance to transfer"
+            // );
 
             require(
                 paymentToken.transferFrom(
