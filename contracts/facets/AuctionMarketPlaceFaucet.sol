@@ -331,15 +331,29 @@ contract AuctionMarketPlaceFaucet is IERC1155TokenReceiver, IERC721Receiver {
             "AuctionMarketPlace: not the winner"
         );
 
-        // get the NFT collection
-        IERC721 nftCollection = IERC721(auction.addressNFTCollection);
+        if (auction.category == LibAppStorage.Categories.ERC721) {
+            // get the NFT collection
+            IERC721 nftCollection = IERC721(auction.addressNFTCollection);
 
-        // transfer the NFT to the winner
-        nftCollection.transferFrom(
-            address(this),
-            msg.sender,
-            auction.nftTokenId
-        );
+            // transfer the NFT to the winner
+            nftCollection.transferFrom(
+                address(this),
+                msg.sender,
+                auction.nftTokenId
+            );
+        }
+
+        if (auction.category == LibAppStorage.Categories.ERC1155) {
+            IERC1155 nftCollection = IERC1155(auction.addressNFTCollection);
+
+            nftCollection.safeTransferFrom(
+                msg.sender,
+                address(this),
+                auction.nftTokenId,
+                auction.tokenAmount,
+                ""
+            );
+        }
 
         // transfer the bid amount to the creator
         IERC20 paymentToken = IERC20(auction.addressPaymentToken);
